@@ -29,7 +29,7 @@ export default async function ProtectedLayout({
             </span>
           </Link>
 
-          <nav className="flex flex-1 items-center gap-1">
+          <nav className="scrollbar-none flex flex-1 items-center gap-1 overflow-x-auto">
             <NavLink href="/">Новый акт</NavLink>
             <NavLink href="/history">
               {user.role === "admin" ? "История" : "Мои акты"}

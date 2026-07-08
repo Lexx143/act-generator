@@ -270,8 +270,8 @@ export function UsersAdmin({
         </Dialog>
       </div>
 
-      <Card className="glass overflow-hidden border-0">
-        <Table>
+      <Card className="glass overflow-x-auto border-0">
+        <Table className="min-w-[760px]">
           <TableHeader>
             <TableRow>
               <TableHead>ФИО</TableHead>

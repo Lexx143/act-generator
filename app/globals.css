@@ -178,6 +178,25 @@
   }
 }
 
+/* На узких экранах уменьшаем предпросмотр бланка (печать не затрагивает) */
+@media screen and (max-width: 900px) {
+  .letterhead {
+    zoom: 0.62;
+  }
+}
+@media screen and (max-width: 520px) {
+  .letterhead {
+    zoom: 0.44;
+  }
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 @media print {
   @page {
     size: A4;

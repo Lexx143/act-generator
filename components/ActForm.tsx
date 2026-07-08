@@ -153,9 +153,15 @@ export function ActForm({
         </CardHeader>
         <CardContent className="space-y-3">
           {equipment.map((row, i) => (
-            <div key={i} className="flex items-end gap-3">
+            <div
+              key={i}
+              className="flex flex-col gap-3 rounded-xl border border-black/5 p-3 sm:flex-row sm:items-end sm:border-0 sm:p-0"
+            >
               <div className="flex-1 space-y-2">
-                {i === 0 && <Label>Наименование</Label>}
+                <Label className="sm:hidden">Наименование</Label>
+                {i === 0 && (
+                  <Label className="hidden sm:block">Наименование</Label>
+                )}
                 <Input
                   placeholder="Ноутбук Asus"
                   value={row.name}
@@ -163,8 +169,13 @@ export function ActForm({
                   required
                 />
               </div>
-              <div className="w-2/5 space-y-2">
-                {i === 0 && <Label>Серийный / инвентарный №</Label>}
+              <div className="space-y-2 sm:w-2/5">
+                <Label className="sm:hidden">Серийный / инвентарный №</Label>
+                {i === 0 && (
+                  <Label className="hidden sm:block">
+                    Серийный / инвентарный №
+                  </Label>
+                )}
                 <Input
                   placeholder="БК000264"
                   value={row.serial}
@@ -175,7 +186,7 @@ export function ActForm({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground shrink-0"
+                className="text-muted-foreground shrink-0 self-end"
                 disabled={equipment.length === 1}
                 onClick={() =>
                   setEquipment((rows) => rows.filter((_, idx) => idx !== i))

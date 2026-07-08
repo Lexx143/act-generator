@@ -140,8 +140,8 @@ export default async function HistoryPage({
         </CardContent>
       </Card>
 
-      <Card className="glass border-0 overflow-hidden">
-        <Table>
+      <Card className="glass overflow-x-auto border-0">
+        <Table className="min-w-[640px]">
           <TableHeader>
             <TableRow>
               <TableHead>№ акта</TableHead>
