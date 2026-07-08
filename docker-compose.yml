@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    container_name: defect-acts
+    restart: always
+    ports:
+      # Только docker-мост: снаружи доступ через Caddy (act.ktgas.kz).
+      # Прямой http://IP:3001 из интернета закрыт.
+      - "172.17.0.1:3001:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DB_PATH=/app/data/acts.db
+      - SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET обязателен (задайте в .env)}
+      - INITIAL_ADMIN_PASSWORD=${INITIAL_ADMIN_PASSWORD:-}
