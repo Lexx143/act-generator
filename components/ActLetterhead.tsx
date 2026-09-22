@@ -116,7 +116,7 @@ export function ActLetterhead(act: Props) {
 
       {/* Подпись и печать */}
       <div
-        className="relative self-end"
+        className="relative self-end break-inside-avoid"
         style={{ marginTop: "16mm", width: "95mm", minHeight: "42mm" }}
       >
         <p className="font-bold">Заключение выдал:</p>
