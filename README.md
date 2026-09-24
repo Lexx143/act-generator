@@ -1,5 +1,7 @@
 # act-generator — генератор актов технической экспертизы
 
+[![CI](https://github.com/Lexx143/act-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/Lexx143/act-generator/actions/workflows/ci.yml)
+
 **Русский** · [English](README.en.md)
 
 Внутреннее веб-приложение ТОО «IT Support Group»: выездной специалист входит под своим логином, заполняет форму и получает готовый акт на фирменном бланке (с печатью и подписью) для сохранения в PDF. Каждый акт фиксируется в базе: кто, когда, для какого клиента.

@@ -1,5 +1,7 @@
 # act-generator — technical inspection report generator
 
+[![CI](https://github.com/Lexx143/act-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/Lexx143/act-generator/actions/workflows/ci.yml)
+
 [Русский](README.md) · **English**
 
 Internal web application for IT Support Group LLP: a field engineer logs in, fills out a form and gets a ready-to-print inspection report on the company letterhead (with the corporate seal and signature) for saving as PDF. Every report is stored in the database with a full audit trail: who created it, when, and for which client.
