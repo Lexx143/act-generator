@@ -159,12 +159,28 @@
   font-family: var(--font-letterhead), Calibri, "Segoe UI", sans-serif;
   color: #111;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   width: 210mm;
+  height: 297mm;
   min-height: 297mm;
+  max-height: 297mm;
   padding: 12mm 14mm 12mm;
   background: white;
   font-size: 13pt;
   line-height: 1.28;
+  overflow: hidden;
+}
+
+.letterhead-body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.letterhead-footer {
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding-top: 6mm;
 }
 
 @media screen {

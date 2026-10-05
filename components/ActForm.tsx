@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Plus, Trash2, FileText } from "lucide-react";
-import { COMPANY, LEGAL_FORMS } from "@/lib/company";
+import { COMPANY } from "@/lib/company";
 import {
   specialistForms,
   type ActExtra,
@@ -54,16 +54,6 @@ function emptyEquipment(): EquipmentItem {
   return { name: "", serial: "" };
 }
 
-function parseClientName(full: string): { form: string; title: string } {
-  const trimmed = full.trim();
-  for (const form of LEGAL_FORMS) {
-    if (trimmed.startsWith(form + " ")) {
-      return { form, title: trimmed.slice(form.length).trim() };
-    }
-  }
-  return { form: "ТОО", title: trimmed };
-}
-
 export function ActForm({
   suggestedNumber,
   defaultDate,
@@ -82,15 +72,7 @@ export function ActForm({
     initial?.act_number ?? suggestedNumber
   );
   const [actDate, setActDate] = useState(initial?.act_date ?? defaultDate);
-
-  const initialClient = useMemo(
-    () => parseClientName(initial?.client_name ?? ""),
-    [initial?.client_name]
-  );
-  const [legalForm, setLegalForm] = useState(initialClient.form);
-  const [clientTitle, setClientTitle] = useState(
-    initial?.extra?.client_title ?? initialClient.title
-  );
+  const [clientName, setClientName] = useState(initial?.client_name ?? "");
 
   const [equipment, setEquipment] = useState<EquipmentItem[]>(
     initial?.equipment?.length ? initial.equipment : [emptyEquipment()]
@@ -103,9 +85,7 @@ export function ActForm({
   );
   /** Утилизация: полное ФИО → сокращение на подписи */
   const [specialistName, setSpecialistName] = useState(
-    initial?.extra?.specialist_full ||
-      defaultFullName ||
-      defaultSigner
+    initial?.extra?.specialist_full || defaultFullName || defaultSigner
   );
   const disposalForms = specialistForms(specialistName);
 
@@ -145,13 +125,9 @@ export function ActForm({
     e.preventDefault();
     setBusy(true);
     try {
-      const clientName = `${legalForm} ${clientTitle}`.trim();
+      const client = clientName.trim();
       const f = specialistForms(specialistName || defaultFullName);
-      // Текст «сервисным специалистом …» — из профиля (творительный) или авто
-      const authorInText =
-        defaultActName ||
-        f.instrumental ||
-        "";
+      const authorInText = defaultActName || f.instrumental || "";
 
       const res = await fetch(isEdit ? `/api/acts/${actId}` : "/api/acts", {
         method: isEdit ? "PATCH" : "POST",
@@ -159,11 +135,10 @@ export function ActForm({
         body: JSON.stringify({
           act_number: actNumber,
           act_date: actDate,
-          client_name: clientName,
+          client_name: client,
           equipment,
           defect_desc: isDisposal ? "" : defectDesc,
           conclusion: isDisposal ? "—" : conclusion,
-          // Экспертиза — полное ФИО; утилизация — сокращение
           signer_name: isDisposal
             ? f.short
             : signerName.trim() || defaultSigner,
@@ -172,8 +147,7 @@ export function ActForm({
           show_signature: showSignature,
           show_specialist: true,
           extra: {
-            legal_form: legalForm,
-            client_title: clientTitle,
+            client_title: client,
             specialist_full: isDisposal ? f.full : "",
             author_act_name: authorInText,
             head_position: headPosition,
@@ -256,28 +230,17 @@ export function ActForm({
             />
           </div>
           <div className="space-y-2 sm:col-span-3">
-            <Label>Клиент (заказчик)</Label>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <select
-                value={legalForm}
-                onChange={(e) => setLegalForm(e.target.value)}
-                className="border-input h-9 rounded-md border bg-transparent px-3 text-sm shadow-xs sm:w-36"
-                aria-label="Организационно-правовая форма"
-              >
-                {LEGAL_FORMS.map((f) => (
-                  <option key={f} value={f}>
-                    {f}
-                  </option>
-                ))}
-              </select>
-              <Input
-                placeholder='Юридическая фирма «AEQUITAS»'
-                value={clientTitle}
-                onChange={(e) => setClientTitle(e.target.value)}
-                required
-                className="flex-1"
-              />
-            </div>
+            <Label htmlFor="client">Клиент (заказчик)</Label>
+            <Input
+              id="client"
+              placeholder='ТОО Юридическая фирма «AEQUITAS»'
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              required
+            />
+            <p className="text-muted-foreground text-xs">
+              Пишите полностью, как на бланке: форма (ТОО / АО / ИП…) и название
+            </p>
           </div>
         </CardContent>
       </Card>

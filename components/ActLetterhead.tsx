@@ -119,149 +119,149 @@ export function ActLetterhead(act: Props) {
   );
 
   return (
-    <div className="letterhead relative flex flex-col">
-      {/* Шапка: логотип + слоган */}
-      <div className="flex items-center gap-[7mm]">
-        <img
-          src="/letterhead/logo.png"
-          alt=""
-          style={{ width: "27mm", height: "auto" }}
-        />
-        <div style={{ fontSize: "13pt", lineHeight: 1.35 }}>
-          {COMPANY.sloganLine1}
-          <br />
-          {COMPANY.sloganLine2}
+    <div className="letterhead relative">
+      <div className="letterhead-body">
+        {/* Шапка: логотип + слоган */}
+        <div className="flex items-center gap-[7mm]">
+          <img
+            src="/letterhead/logo.png"
+            alt=""
+            style={{ width: "27mm", height: "auto" }}
+          />
+          <div style={{ fontSize: "13pt", lineHeight: 1.35 }}>
+            {COMPANY.sloganLine1}
+            <br />
+            {COMPANY.sloganLine2}
+          </div>
         </div>
-      </div>
 
-      {/* Заголовок и дата */}
-      <div
-        className="text-center"
-        style={{ fontSize: "17pt", marginTop: "7mm" }}
-      >
-        {isDisposal ? title : (
-          <>
-            {title} №&nbsp;{act.actNumber}
-          </>
-        )}
-      </div>
-      <div className="text-right" style={{ marginTop: "4mm" }}>
-        {fmtDate(act.actDate)}г.
-      </div>
+        {/* Заголовок и дата */}
+        <div
+          className="text-center"
+          style={{ fontSize: "17pt", marginTop: "7mm" }}
+        >
+          {isDisposal ? (
+            title
+          ) : (
+            <>
+              {title} №&nbsp;{act.actNumber}
+            </>
+          )}
+        </div>
+        <div className="text-right" style={{ marginTop: "4mm" }}>
+          {fmtDate(act.actDate)}г.
+        </div>
 
-      {/* Вводный абзац */}
-      <p
-        className="text-justify"
-        style={{ marginTop: "4mm", textIndent: "12mm" }}
-      >
-        Настоящий акт составлен {introSpecialist} по заявке {act.clientName}{" "}
-        {purpose}:
-      </p>
+        {/* Вводный абзац */}
+        <p
+          className="text-justify"
+          style={{ marginTop: "4mm", textIndent: "12mm" }}
+        >
+          Настоящий акт составлен {introSpecialist} по заявке {act.clientName}{" "}
+          {purpose}:
+        </p>
 
-      <EquipmentTable equipment={act.equipment} />
+        <EquipmentTable equipment={act.equipment} />
 
-      {isDisposal ? (
-        <>
+        {isDisposal ? (
           <p
             className="text-justify"
             style={{ marginTop: "5mm", textIndent: "12mm" }}
           >
             {DISPOSAL_BODY}
           </p>
-
-          {/* Подписи сторон — как в Word-шаблоне */}
-          <div className="mt-auto" style={{ marginTop: "8mm", fontSize: "12pt" }}>
-            <div
-              className="relative grid grid-cols-2 gap-[8mm]"
-              style={{ minHeight: "42mm" }}
-            >
-              {/* Левая колонка */}
-              <div>
-                <p>От {COMPANY.name}</p>
-                <p style={{ marginTop: "4mm" }}>{headPosition}:</p>
-                <p style={{ marginTop: "2mm" }}>
-                  {headName}
-                  <span
-                    className="inline-block border-b border-black align-baseline"
-                    style={{ width: "32mm", marginLeft: "2mm" }}
-                  />
-                </p>
-                <p style={{ marginTop: "5mm" }}>Сервисный специалист:</p>
-                <p style={{ marginTop: "2mm" }}>
-                  {specialistShort}
-                  <span
-                    className="inline-block border-b border-black align-baseline"
-                    style={{ width: "32mm", marginLeft: "2mm" }}
-                  />
-                </p>
-              </div>
-
-              {/* Правая колонка — клиент */}
-              <div>
-                <p>От {act.clientName}</p>
-                <p style={{ marginTop: "4mm" }}>
-                  Должность:{" "}
-                  <span
-                    className="inline-block border-b border-black align-baseline"
-                    style={{ width: "42mm" }}
-                  />
-                </p>
-                <p style={{ marginTop: "5mm" }}>
-                  ФИО:{" "}
-                  <span
-                    className="inline-block border-b border-black align-baseline"
-                    style={{ width: "50mm" }}
-                  />
-                </p>
-                <p style={{ marginTop: "5mm" }}>
-                  Подпись:{" "}
-                  <span
-                    className="inline-block border-b border-black align-baseline"
-                    style={{ width: "36mm" }}
-                  />
-                </p>
-              </div>
-
-              {showSignature && (
-                <img
-                  src="/letterhead/signature.png"
-                  alt=""
-                  className="absolute"
-                  style={{
-                    width: "36mm",
-                    left: "18mm",
-                    top: "8mm",
-                    transform: "rotate(-4deg)",
-                  }}
-                />
-              )}
-              {showSeal && (
-                <img
-                  src="/letterhead/seal.png"
-                  alt=""
-                  className="absolute"
-                  style={{
-                    width: "42mm",
-                    left: "8mm",
-                    top: "10mm",
-                    opacity: 0.94,
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
+        ) : (
           <div style={{ marginTop: "5mm" }}>
             <p className="font-bold">Заключение:</p>
             {act.defectDesc && <Paragraphs text={act.defectDesc} />}
             <Paragraphs text={act.conclusion} />
           </div>
+        )}
+      </div>
 
+      {/* Подписи — всегда в самом низу бланка A4 */}
+      <div className="letterhead-footer">
+        {isDisposal ? (
           <div
-            className="relative mt-auto self-end"
-            style={{ marginTop: "10mm", width: "95mm", minHeight: "38mm" }}
+            className="relative grid grid-cols-2 gap-[8mm]"
+            style={{ fontSize: "12pt" }}
+          >
+            <div>
+              <p>От {COMPANY.name}</p>
+              <p style={{ marginTop: "4mm" }}>{headPosition}:</p>
+              <p style={{ marginTop: "2mm" }}>
+                {headName}
+                <span
+                  className="inline-block border-b border-black align-baseline"
+                  style={{ width: "32mm", marginLeft: "2mm" }}
+                />
+              </p>
+              <p style={{ marginTop: "5mm" }}>Сервисный специалист:</p>
+              <p style={{ marginTop: "2mm" }}>
+                {specialistShort}
+                <span
+                  className="inline-block border-b border-black align-baseline"
+                  style={{ width: "32mm", marginLeft: "2mm" }}
+                />
+              </p>
+            </div>
+
+            <div>
+              <p>От {act.clientName}</p>
+              <p style={{ marginTop: "4mm" }}>
+                Должность:{" "}
+                <span
+                  className="inline-block border-b border-black align-baseline"
+                  style={{ width: "42mm" }}
+                />
+              </p>
+              <p style={{ marginTop: "5mm" }}>
+                ФИО:{" "}
+                <span
+                  className="inline-block border-b border-black align-baseline"
+                  style={{ width: "50mm" }}
+                />
+              </p>
+              <p style={{ marginTop: "5mm" }}>
+                Подпись:{" "}
+                <span
+                  className="inline-block border-b border-black align-baseline"
+                  style={{ width: "36mm" }}
+                />
+              </p>
+            </div>
+
+            {showSignature && (
+              <img
+                src="/letterhead/signature.png"
+                alt=""
+                className="absolute"
+                style={{
+                  width: "36mm",
+                  left: "18mm",
+                  top: "8mm",
+                  transform: "rotate(-4deg)",
+                }}
+              />
+            )}
+            {showSeal && (
+              <img
+                src="/letterhead/seal.png"
+                alt=""
+                className="absolute"
+                style={{
+                  width: "42mm",
+                  left: "8mm",
+                  top: "10mm",
+                  opacity: 0.94,
+                }}
+              />
+            )}
+          </div>
+        ) : (
+          <div
+            className="relative ml-auto"
+            style={{ width: "95mm", minHeight: "38mm" }}
           >
             <p className="font-bold">Заключение выдал:</p>
             <p style={{ marginTop: "3mm" }}>
@@ -298,8 +298,8 @@ export function ActLetterhead(act: Props) {
               />
             )}
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }
