@@ -3,6 +3,10 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
+import type { ActType } from "@/lib/act-types";
+
+export type { ActExtra, ActType, EquipmentItem } from "@/lib/act-types";
+export { parseActExtra, shortNameFromFull } from "@/lib/act-types";
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (
@@ -25,6 +29,11 @@ CREATE TABLE IF NOT EXISTS acts (
   defect_desc   TEXT NOT NULL DEFAULT '',
   conclusion    TEXT NOT NULL,
   signer_name   TEXT NOT NULL,
+  act_type      TEXT NOT NULL DEFAULT 'expertise',
+  show_seal     INTEGER NOT NULL DEFAULT 1,
+  show_signature INTEGER NOT NULL DEFAULT 1,
+  show_specialist INTEGER NOT NULL DEFAULT 1,
+  extra         TEXT NOT NULL DEFAULT '{}',
   created_by    INTEGER NOT NULL REFERENCES users(id),
   created_at    TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at    TEXT
@@ -53,13 +62,16 @@ export type ActRow = {
   defect_desc: string;
   conclusion: string;
   signer_name: string;
+  act_type: ActType;
+  show_seal: number;
+  show_signature: number;
+  show_specialist: number;
+  extra: string;
   created_by: number;
   created_at: string;
   updated_at: string | null;
   author_name?: string;
 };
-
-export type EquipmentItem = { name: string; serial: string };
 
 declare global {
   // eslint-disable-next-line no-var
@@ -82,6 +94,39 @@ function seedAdminIfEmpty(db: Database.Database) {
   console.log("=".repeat(60));
 }
 
+function migrateActs(db: Database.Database) {
+  const actCols = db.prepare("PRAGMA table_info(acts)").all() as {
+    name: string;
+  }[];
+  const names = new Set(actCols.map((c) => c.name));
+  if (!names.has("updated_at")) {
+    db.exec("ALTER TABLE acts ADD COLUMN updated_at TEXT");
+  }
+  if (!names.has("act_type")) {
+    db.exec(
+      "ALTER TABLE acts ADD COLUMN act_type TEXT NOT NULL DEFAULT 'expertise'"
+    );
+  }
+  if (!names.has("show_seal")) {
+    db.exec(
+      "ALTER TABLE acts ADD COLUMN show_seal INTEGER NOT NULL DEFAULT 1"
+    );
+  }
+  if (!names.has("show_signature")) {
+    db.exec(
+      "ALTER TABLE acts ADD COLUMN show_signature INTEGER NOT NULL DEFAULT 1"
+    );
+  }
+  if (!names.has("show_specialist")) {
+    db.exec(
+      "ALTER TABLE acts ADD COLUMN show_specialist INTEGER NOT NULL DEFAULT 1"
+    );
+  }
+  if (!names.has("extra")) {
+    db.exec("ALTER TABLE acts ADD COLUMN extra TEXT NOT NULL DEFAULT '{}'");
+  }
+}
+
 export function getDb(): Database.Database {
   if (global.__defectActsDb) return global.__defectActsDb;
   const dbPath =
@@ -98,12 +143,7 @@ export function getDb(): Database.Database {
   if (!userCols.some((c) => c.name === "act_name")) {
     db.exec("ALTER TABLE users ADD COLUMN act_name TEXT NOT NULL DEFAULT ''");
   }
-  const actCols = db.prepare("PRAGMA table_info(acts)").all() as {
-    name: string;
-  }[];
-  if (!actCols.some((c) => c.name === "updated_at")) {
-    db.exec("ALTER TABLE acts ADD COLUMN updated_at TEXT");
-  }
+  migrateActs(db);
   seedAdminIfEmpty(db);
   global.__defectActsDb = db;
   return db;

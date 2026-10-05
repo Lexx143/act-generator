@@ -141,10 +141,11 @@ export default async function HistoryPage({
       </Card>
 
       <Card className="glass overflow-x-auto border-0">
-        <Table className="min-w-[640px]">
+        <Table className="min-w-[720px]">
           <TableHeader>
             <TableRow>
               <TableHead>№ акта</TableHead>
+              <TableHead>Тип</TableHead>
               <TableHead>Дата акта</TableHead>
               <TableHead>Клиент</TableHead>
               <TableHead className="hidden md:table-cell">
@@ -158,7 +159,7 @@ export default async function HistoryPage({
             {acts.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={7}
                   className="text-muted-foreground py-10 text-center"
                 >
                   Актов пока нет
@@ -174,6 +175,11 @@ export default async function HistoryPage({
                   >
                     {act.act_number}
                   </Link>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline">
+                    {act.act_type === "disposal" ? "Утилизация" : "Экспертиза"}
+                  </Badge>
                 </TableCell>
                 <TableCell>{fmtDate(act.act_date)}</TableCell>
                 <TableCell>{act.client_name}</TableCell>
