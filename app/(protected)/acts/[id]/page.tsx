@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
-import { getDb, type ActRow, type EquipmentItem } from "@/lib/db";
+import {
+  getDb,
+  parseActExtra,
+  type ActRow,
+  type ActType,
+  type EquipmentItem,
+} from "@/lib/db";
 import { fmtTimestamp } from "@/lib/format";
 import { ActLetterhead } from "@/components/ActLetterhead";
 import { PrintButton } from "@/components/PrintButton";
@@ -43,6 +49,12 @@ export default async function ActPage({
     equipment = [];
   }
 
+  const actType: ActType =
+    act.act_type === "disposal" ? "disposal" : "expertise";
+  const extra = parseActExtra(act.extra);
+  const title =
+    actType === "disposal" ? "Акт утилизации" : "Акт тех. экспертизы";
+
   return (
     <div className="space-y-6">
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
@@ -57,7 +69,7 @@ export default async function ActPage({
           </Button>
           <div>
             <h1 className="text-xl font-bold tracking-tight">
-              Акт № {act.act_number}
+              {title} № {act.act_number}
             </h1>
             <p className="text-muted-foreground text-xs">
               Создал(а) {act.author_name} · {fmtTimestamp(act.created_at)}
@@ -89,7 +101,16 @@ export default async function ActPage({
             defectDesc={act.defect_desc}
             conclusion={act.conclusion}
             signerName={act.signer_name}
-            authorName={act.author_act_name || act.author_name!}
+            authorName={
+              extra.author_act_name ||
+              act.author_act_name ||
+              act.author_name!
+            }
+            actType={actType}
+            showSeal={act.show_seal !== 0}
+            showSignature={act.show_signature !== 0}
+            showSpecialist={act.show_specialist !== 0}
+            extra={extra}
           />
         </div>
       </div>
