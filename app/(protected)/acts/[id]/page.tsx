@@ -10,6 +10,7 @@ import {
 } from "@/lib/db";
 import { fmtTimestamp } from "@/lib/format";
 import { ActLetterhead } from "@/components/ActLetterhead";
+import { A4PagePreview } from "@/components/A4PagePreview";
 import { PrintButton } from "@/components/PrintButton";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Pencil } from "lucide-react";
@@ -36,7 +37,6 @@ export default async function ActPage({
 
   if (!act) notFound();
 
-  // Обычный пользователь видит только собственные акты
   const user = await getSessionUser();
   if (user?.role !== "admin" && act.created_by !== user?.uid) {
     notFound();
@@ -54,6 +54,26 @@ export default async function ActPage({
   const extra = parseActExtra(act.extra);
   const title =
     actType === "disposal" ? "Акт утилизации" : "Акт тех. экспертизы";
+
+  const letterhead = (
+    <ActLetterhead
+      actNumber={act.act_number}
+      actDate={act.act_date}
+      clientName={act.client_name}
+      equipment={equipment}
+      defectDesc={act.defect_desc}
+      conclusion={act.conclusion}
+      signerName={act.signer_name}
+      authorName={
+        extra.author_act_name || act.author_act_name || act.author_name!
+      }
+      actType={actType}
+      showSeal={act.show_seal !== 0}
+      showSignature={act.show_signature !== 0}
+      showSpecialist={act.show_specialist !== 0}
+      extra={extra}
+    />
+  );
 
   return (
     <div className="space-y-6">
@@ -93,25 +113,7 @@ export default async function ActPage({
 
       <div className="letterhead-viewport -mx-4 overflow-x-auto px-4 pb-8">
         <div className="mx-auto w-fit">
-          <ActLetterhead
-            actNumber={act.act_number}
-            actDate={act.act_date}
-            clientName={act.client_name}
-            equipment={equipment}
-            defectDesc={act.defect_desc}
-            conclusion={act.conclusion}
-            signerName={act.signer_name}
-            authorName={
-              extra.author_act_name ||
-              act.author_act_name ||
-              act.author_name!
-            }
-            actType={actType}
-            showSeal={act.show_seal !== 0}
-            showSignature={act.show_signature !== 0}
-            showSpecialist={act.show_specialist !== 0}
-            extra={extra}
-          />
+          <A4PagePreview>{letterhead}</A4PagePreview>
         </div>
       </div>
     </div>
