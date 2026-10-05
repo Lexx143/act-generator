@@ -162,25 +162,26 @@
   display: flex;
   flex-direction: column;
   width: 210mm;
-  height: 297mm;
+  /* Минимум 1 лист; при длинной таблице растёт на 2–3 страницы */
   min-height: 297mm;
-  max-height: 297mm;
-  padding: 12mm 14mm 12mm;
+  height: auto;
+  padding: 12mm 14mm 14mm;
   background: white;
   font-size: 13pt;
   line-height: 1.28;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .letterhead-body {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 1 auto;
 }
 
 .letterhead-footer {
   flex: 0 0 auto;
   margin-top: auto;
-  padding-top: 6mm;
+  padding-top: 8mm;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 @media screen {
@@ -225,9 +226,9 @@
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
-  /* Скрываем всё, кроме бланка — иначе оболочка даёт 2-ю страницу */
+  /* Скрываем оболочку сайта, печатаем бланк (может быть 1–N страниц) */
   body * {
     visibility: hidden !important;
   }
@@ -240,19 +241,22 @@
     left: 0 !important;
     top: 0 !important;
     width: 210mm !important;
-    height: 297mm !important;
-    min-height: 0 !important;
-    max-height: 297mm !important;
+    height: auto !important;
+    min-height: 297mm !important;
+    max-height: none !important;
     margin: 0 !important;
-    padding: 11mm 13mm 10mm !important;
+    padding: 11mm 13mm 12mm !important;
     box-shadow: none !important;
     border-radius: 0 !important;
     transform: none !important;
     zoom: 1 !important;
-    overflow: hidden !important;
-    page-break-after: avoid !important;
-    page-break-inside: avoid !important;
+    overflow: visible !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+  .letterhead-footer {
     break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
   .no-print {
     display: none !important;
