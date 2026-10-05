@@ -173,13 +173,16 @@
 }
 
 .letterhead-body {
-  flex: 0 1 auto;
+  flex: 0 0 auto;
+}
+
+.letterhead-spacer {
+  flex: 0 0 auto;
 }
 
 .letterhead-footer {
   flex: 0 0 auto;
-  margin-top: auto;
-  padding-top: 8mm;
+  padding-top: 4mm;
   break-inside: avoid;
   page-break-inside: avoid;
 }
