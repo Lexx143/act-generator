@@ -116,7 +116,7 @@ export function ActLetterhead(act: Props) {
   const headPosition = extra.head_position || COMPANY.defaultHeadPosition;
   const headName = extra.head_name || COMPANY.defaultHeadName;
 
-  const body = (
+  const main = (
     <>
       <div className="flex items-center gap-[7mm]">
         <img
@@ -157,14 +157,7 @@ export function ActLetterhead(act: Props) {
 
       <EquipmentTable equipment={act.equipment} />
 
-      {isDisposal ? (
-        <p
-          className="text-justify"
-          style={{ marginTop: "5mm", textIndent: "12mm" }}
-        >
-          {DISPOSAL_BODY}
-        </p>
-      ) : (
+      {!isDisposal && (
         <div style={{ marginTop: "5mm" }}>
           <p className="font-bold">Заключение:</p>
           {act.defectDesc && <Paragraphs text={act.defectDesc} />}
@@ -173,6 +166,15 @@ export function ActLetterhead(act: Props) {
       )}
     </>
   );
+
+  const closingText = isDisposal ? (
+    <p
+      className="text-justify"
+      style={{ marginTop: "5mm", textIndent: "12mm" }}
+    >
+      {DISPOSAL_BODY}
+    </p>
+  ) : undefined;
 
   const footer = isDisposal ? (
     <div
@@ -293,5 +295,7 @@ export function ActLetterhead(act: Props) {
     </div>
   );
 
-  return <LetterheadFrame body={body} footer={footer} />;
+  return (
+    <LetterheadFrame main={main} closingText={closingText} footer={footer} />
+  );
 }
