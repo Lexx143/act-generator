@@ -156,17 +156,10 @@ export function ActLetterhead(act: Props) {
       </p>
 
       <EquipmentTable equipment={act.equipment} />
-
-      {!isDisposal && (
-        <div style={{ marginTop: "5mm" }}>
-          <p className="font-bold">Заключение:</p>
-          {act.defectDesc && <Paragraphs text={act.defectDesc} />}
-          <Paragraphs text={act.conclusion} />
-        </div>
-      )}
     </>
   );
 
+  /* Текст идёт сразу за таблицей. Внизу листа остаётся только подпись. */
   const closingText = isDisposal ? (
     <p
       className="text-justify"
@@ -174,7 +167,13 @@ export function ActLetterhead(act: Props) {
     >
       {DISPOSAL_BODY}
     </p>
-  ) : undefined;
+  ) : (
+    <div style={{ marginTop: "5mm" }}>
+      <p className="font-bold">Заключение:</p>
+      {act.defectDesc ? <Paragraphs text={act.defectDesc} /> : null}
+      {act.conclusion ? <Paragraphs text={act.conclusion} /> : null}
+    </div>
+  );
 
   const footer = isDisposal ? (
     <div

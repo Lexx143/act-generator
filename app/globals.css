@@ -176,30 +176,53 @@
   flex: 0 0 auto;
 }
 
-.letterhead-closing {
-  flex: 1 1 auto;
+/* Поток текста сверху. Высота кратна A4, подпись прижата к низу последнего листа. */
+.letterhead.letterhead--flow {
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  height: var(--lh-flow-h, 297mm);
+  min-height: var(--lh-flow-h, 297mm);
+  overflow: hidden;
 }
 
-.letterhead-closing--new-page {
-  break-before: page;
-  page-break-before: always;
-  /* Последний лист целиком под текст + подписи */
-  min-height: calc(297mm - 24mm);
+.letterhead--flow > .letterhead-main,
+.letterhead--flow > .letterhead-footer {
+  flex: 0 0 auto;
+}
+
+.letterhead--flow > .letterhead-footer {
+  margin-top: auto;
 }
 
 .letterhead-closing-text {
   flex: 0 0 auto;
 }
 
-.letterhead-spacer {
-  flex: 0 0 auto;
+/* Растягивает пустоту между таблицей и нижним блоком */
+.letterhead-spacer-flex {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Один лист и лист с заключением — ровно N×A4, иначе flex не прижмёт подпись вниз */
+.letterhead--single,
+.letterhead--closing-page {
+  height: var(--lh-block-h, 297mm);
+  min-height: var(--lh-block-h, 297mm);
+}
+
+/* Разделённый акт: таблица отдельно, текст+подписи на последнем листе внизу */
+.letterhead-pages > .letterhead--body {
+  height: auto;
+  min-height: 0;
+}
+
+.letterhead-pages > .letterhead--closing-page {
+  break-before: page;
+  page-break-before: always;
 }
 
 .letterhead-footer {
-  flex: 0 0 auto;
   padding-top: 4mm;
   break-inside: avoid;
   page-break-inside: avoid;
@@ -207,16 +230,16 @@
 
 /* ==== Предпросмотр A4 на экране ==== */
 
-.a4-measure {
+/* Эталон для замера + печать (на экране спрятан, но в потоке для layout) */
+.a4-host-source {
   position: absolute;
   left: -10000px;
   top: 0;
   width: 210mm;
   pointer-events: none;
-  visibility: hidden;
 }
 
-.a4-measure .letterhead {
+.a4-host-source .letterhead {
   zoom: 1 !important;
   box-shadow: none !important;
   border-radius: 0 !important;
@@ -257,6 +280,36 @@
   min-height: 297mm;
 }
 
+.a4-sheet-shift--body .letterhead--body {
+  min-height: auto;
+}
+
+.a4-sheet-shift--body .letterhead--closing-page {
+  display: none !important;
+}
+
+.a4-sheet-shift--closing .letterhead--body {
+  display: none !important;
+}
+
+.a4-sheet-shift--closing .letterhead--closing-page {
+  min-height: var(--lh-block-h, 297mm);
+}
+
+.a4-sheet-shift .letterhead.letterhead--flow,
+.a4-host-source .letterhead.letterhead--flow {
+  display: flex !important;
+  flex-direction: column !important;
+  height: var(--lh-flow-h, 297mm) !important;
+  min-height: var(--lh-flow-h, 297mm) !important;
+  overflow: hidden !important;
+}
+
+.a4-sheet-shift .letterhead.letterhead--flow > .letterhead-footer,
+.a4-host-source .letterhead.letterhead--flow > .letterhead-footer {
+  margin-top: auto !important;
+}
+
 .a4-sheet-label {
   text-align: center;
   font-size: 12px;
@@ -264,10 +317,6 @@
   padding: 8px 0 4px;
   background: oklch(0.97 0.005 260);
   border-top: 1px solid oklch(0.9 0.01 260);
-}
-
-.a4-print-source {
-  display: none;
 }
 
 @media screen {
@@ -298,8 +347,7 @@
     zoom: 0.62;
   }
   .a4-sheet-shift .letterhead,
-  .a4-measure .letterhead,
-  .a4-print-source .letterhead {
+  .a4-host-source .letterhead {
     zoom: 1 !important;
   }
 }
@@ -308,8 +356,7 @@
     zoom: 0.44;
   }
   .a4-sheet-shift .letterhead,
-  .a4-measure .letterhead,
-  .a4-print-source .letterhead {
+  .a4-host-source .letterhead {
     zoom: 1 !important;
   }
 }
@@ -342,6 +389,10 @@
   .letterhead * {
     visibility: visible !important;
   }
+  .letterhead-pages,
+  .letterhead-pages * {
+    visibility: visible !important;
+  }
   .letterhead {
     position: absolute !important;
     left: 0 !important;
@@ -360,24 +411,68 @@
     page-break-inside: auto !important;
     break-inside: auto !important;
   }
+  .letterhead-pages {
+    position: relative !important;
+    width: 210mm !important;
+  }
+  .letterhead-pages > .letterhead {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+  }
+  .letterhead-pages > .letterhead--body {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .letterhead-pages > .letterhead--flow {
+    display: flex !important;
+    flex-direction: column !important;
+    height: var(--lh-flow-h, 297mm) !important;
+    min-height: var(--lh-flow-h, 297mm) !important;
+    overflow: hidden !important;
+  }
+  .letterhead-pages > .letterhead--flow > .letterhead-footer {
+    margin-top: auto !important;
+  }
+  .letterhead-pages > .letterhead--single,
+  .letterhead-pages > .letterhead--closing-page {
+    display: flex !important;
+    flex-direction: column !important;
+    height: var(--lh-block-h, 297mm) !important;
+    min-height: var(--lh-block-h, 297mm) !important;
+    overflow: hidden !important;
+  }
+  .letterhead-pages > .letterhead--closing-page {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .letterhead-bottom {
+    margin-top: auto !important;
+  }
   .letterhead-footer {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
-  .letterhead-closing--new-page {
-    break-before: page !important;
-    page-break-before: always !important;
-    min-height: calc(297mm - 22mm) !important;
-  }
   .a4-preview-stack,
-  .a4-measure,
   .a4-sheet-label {
     display: none !important;
   }
-  .a4-print-source {
-    display: block !important;
+  .a4-host-source {
+    position: static !important;
+    left: auto !important;
+    pointer-events: auto !important;
   }
   .no-print {
     display: none !important;
+  }
+  body main,
+  .letterhead-viewport,
+  .a4-host,
+  .a4-host-source,
+  .space-y-6 > * {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    background: transparent !important;
   }
 }
