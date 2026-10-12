@@ -245,16 +245,23 @@ export function LetterheadFrame({ main, closingText, footer }: Props) {
   return (
     <div ref={rootRef} className="letterhead-pages" data-pages={pageCount}>
       <div className="letterhead letterhead--flow" style={flowStyle}>
-        <div ref={mainRef} className="letterhead-main">
+        <div
+          ref={mainRef}
+          className="letterhead-main"
+          style={{ minWidth: 0, maxWidth: "100%" }}
+        >
           {main}
         </div>
         {closingText ? (
           <div
             ref={closingRef}
             className="letterhead-closing-text"
-            style={
-              closingShiftPx > 0 ? { paddingTop: closingShiftPx } : undefined
-            }
+            style={{
+              minWidth: 0,
+              maxWidth: "100%",
+              overflowWrap: "anywhere",
+              ...(closingShiftPx > 0 ? { paddingTop: closingShiftPx } : null),
+            }}
           >
             {closingText}
           </div>
