@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { type ReactNode } from "react";
 import {
   LetterheadLayoutProvider,
   useLetterheadLayout,
@@ -26,48 +20,13 @@ type Sheet = {
 };
 
 function PreviewInner({ children }: { children: ReactNode }) {
-  const hostRef = useRef<HTMLDivElement>(null);
   const layout = useLetterheadLayout();
-  const [sheets, setSheets] = useState<Sheet[]>([{ key: "0", offsetPx: 0 }]);
-
-  const recalcSheets = useCallback(() => {
-    const count = Math.max(1, layout?.ready ? layout.pageCount : 1);
-    const pagePx =
-      layout?.flowPx && count ? layout.flowPx / count : 0;
-    const next: Sheet[] = [];
-    for (let i = 0; i < count; i++) {
-      next.push({ key: `p-${i}`, offsetPx: pagePx * i });
-    }
-    setSheets((prev) => {
-      if (
-        prev.length === next.length &&
-        prev.every((s, i) => s.key === next[i].key && s.offsetPx === next[i].offsetPx)
-      ) {
-        return prev;
-      }
-      return next;
-    });
-  }, [layout]);
-
-  useLayoutEffect(() => {
-    recalcSheets();
-    const host = hostRef.current;
-    if (!host) return;
-    const ro = new ResizeObserver(() => recalcSheets());
-    ro.observe(host);
-    const pages = host.querySelector(".letterhead-pages");
-    if (pages) {
-      ro.observe(pages);
-      pages.querySelectorAll(".letterhead").forEach((el) => ro.observe(el));
-    }
-    window.addEventListener("resize", recalcSheets);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", recalcSheets);
-    };
-  }, [recalcSheets, children]);
-
-  const pageCount = sheets.length;
+  const pageCount = Math.max(1, layout?.ready ? layout.pageCount : 1);
+  const pagePx = layout?.flowPx && pageCount ? layout.flowPx / pageCount : 0;
+  const sheets: Sheet[] = [];
+  for (let i = 0; i < pageCount; i++) {
+    sheets.push({ key: `p-${i}`, offsetPx: pagePx * i });
+  }
   const pending = !layout?.ready;
 
   return (
@@ -86,7 +45,7 @@ function PreviewInner({ children }: { children: ReactNode }) {
         </p>
       </div>
 
-      <div ref={hostRef} className="a4-host">
+      <div className="a4-host">
         {/* Эталон: считает раскладку, при печати виден */}
         <div className="a4-host-source">{children}</div>
 
