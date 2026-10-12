@@ -26,17 +26,27 @@ type Props = {
 };
 
 function Paragraphs({ text }: { text: string }) {
+  const parts = text
+    .split(/\n{2,}/)
+    .map((p) => p.replace(/^\s*\n|\n\s*$/g, ""))
+    .filter((p) => p.trim());
   return (
     <>
-      {text
-        .split(/\n+/)
-        .map((p) => p.trim())
-        .filter(Boolean)
-        .map((p, i) => (
-          <p key={i} className="text-justify">
-            {p}
-          </p>
-        ))}
+      {parts.map((p, i) => (
+        <p
+          key={i}
+          className="letterhead-prose"
+          style={{
+            whiteSpace: "pre-wrap",
+            overflowWrap: "anywhere",
+            wordBreak: "break-word",
+            textAlign: "justify",
+            marginTop: i ? "3mm" : undefined,
+          }}
+        >
+          {p}
+        </p>
+      ))}
     </>
   );
 }
@@ -45,7 +55,7 @@ function EquipmentTable({ equipment }: { equipment: EquipmentItem[] }) {
   return (
     <table
       className="w-full border-collapse"
-      style={{ marginTop: "5mm", fontSize: "12pt" }}
+      style={{ marginTop: "5mm", fontSize: "12pt", tableLayout: "fixed" }}
     >
       <thead>
         <tr>
@@ -72,10 +82,16 @@ function EquipmentTable({ equipment }: { equipment: EquipmentItem[] }) {
             <td className="border border-black px-2 py-2 text-center">
               {i + 1}
             </td>
-            <td className="border border-black px-2 py-2 text-center">
+            <td
+              className="border border-black px-2 py-2 text-center"
+              style={{ overflowWrap: "anywhere" }}
+            >
               {item.name}
             </td>
-            <td className="border border-black px-2 py-2 text-center">
+            <td
+              className="border border-black px-2 py-2 text-center"
+              style={{ overflowWrap: "anywhere" }}
+            >
               {item.serial || "-"}
             </td>
           </tr>

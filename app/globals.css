@@ -176,6 +176,33 @@
   flex: 0 0 auto;
 }
 
+/* Текст как в редакторе: перенос по пробелам, длинная строка не вылезает за лист. */
+.letterhead-main,
+.letterhead-closing-text,
+.letterhead-footer {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.letterhead p,
+.letterhead td,
+.letterhead th {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.letterhead table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.letterhead-prose {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  text-align: justify;
+}
+
 /* Поток текста сверху. Высота кратна A4, подпись прижата к низу последнего листа. */
 .letterhead.letterhead--flow {
   display: flex;
