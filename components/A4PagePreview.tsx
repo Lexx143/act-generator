@@ -49,9 +49,9 @@ function PreviewInner({ children }: { children: ReactNode }) {
         {/* Эталон: считает раскладку, при печати виден */}
         <div className="a4-host-source">{children}</div>
 
-        {/* Экран: листы клипуют клоны, раскладка из Context */}
+        {/* Те же листы на экране и в PDF: клип, без повторной вёрстки при печати */}
         <div
-          className="no-print a4-preview-stack"
+          className="a4-preview-stack"
           style={pending ? { visibility: "hidden" } : undefined}
         >
           {sheets.map((sheet, i) => (
