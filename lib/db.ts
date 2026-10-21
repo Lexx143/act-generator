@@ -94,6 +94,14 @@ function seedAdminIfEmpty(db: Database.Database) {
   console.log("=".repeat(60));
 }
 
+/** Выдать права администратора конкретным логинам (идемпотентно). */
+function ensureAdminLogins(db: Database.Database) {
+  // Запрос владельца: учётка 219 должна управлять пользователями на act.ktgas.kz
+  db.prepare(
+    "UPDATE users SET role = 'admin', is_active = 1 WHERE login = ? AND role != 'admin'"
+  ).run("219");
+}
+
 function migrateActs(db: Database.Database) {
   const actCols = db.prepare("PRAGMA table_info(acts)").all() as {
     name: string;
@@ -145,6 +153,7 @@ export function getDb(): Database.Database {
   }
   migrateActs(db);
   seedAdminIfEmpty(db);
+  ensureAdminLogins(db);
   global.__defectActsDb = db;
   return db;
 }
