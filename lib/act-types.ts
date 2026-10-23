@@ -63,10 +63,15 @@ function firstNameToInstrumental(s: string): string {
   return s + "ом";
 }
 
+/** Несклоняемые/типичные фамилии на -енко/-ко/-ук… */
+function isIndeclinableSurname(s: string): boolean {
+  return /(енко|ченко|цко|ко|ук|юк|их|ых)$/i.test(s);
+}
+
 /**
  * «Курганский Никита» → «Курганским Никитой»
  * «Василенко Константин» → «Василенко Константином»
- * Уже в творительном (заканчивается на -ым/-им/-ой и т.п. и второе слово тоже) — как есть.
+ * «Александр Золотько» → «Александром Золотько» (Имя + несклоняемая фамилия)
  */
 export function toInstrumentalName(full: string): string {
   const trimmed = full.trim().replace(/\s+/g, " ");
@@ -75,9 +80,31 @@ export function toInstrumentalName(full: string): string {
   if (parts.length === 1) return surnameToInstrumental(parts[0]);
   // Уже сокращённое «Василенко К.» — не склоняем
   if (/^[A-Za-zА-ЯЁа-яё]\.$/u.test(parts[1])) return trimmed;
+
+  // Имя Фамилия, когда фамилия несклоняемая: «Александр Золотько»
+  if (!isIndeclinableSurname(parts[0]) && isIndeclinableSurname(parts[1])) {
+    return [firstNameToInstrumental(parts[0]), parts[1], ...parts.slice(2)].join(
+      " "
+    );
+  }
+
+  // Фамилия Имя (основной порядок)
   const last = surnameToInstrumental(parts[0]);
   const first = firstNameToInstrumental(parts[1]);
   return [last, first, ...parts.slice(2)].join(" ");
+}
+
+/**
+ * Для фразы «акт составлен …»: если уже творительный — не трогаем,
+ * иначе склоняем. «Александр Золотько» → «Александром Золотько».
+ */
+export function ensureInstrumentalName(full: string): string {
+  const trimmed = full.trim().replace(/\s+/g, " ");
+  if (!trimmed) return "";
+  const parts = trimmed.split(" ").filter(Boolean);
+  // Уже есть слово в творительном (Александром / Курганским / Никитой …)
+  if (parts.some((p) => /(ом|ем|ым|им|ой|ей)$/i.test(p))) return trimmed;
+  return toInstrumentalName(trimmed);
 }
 
 /** Полное ФИО → формы для бланка */

@@ -2,6 +2,7 @@
 import { COMPANY, DISPOSAL_BODY } from "@/lib/company";
 import { fmtDate } from "@/lib/format";
 import {
+  ensureInstrumentalName,
   shortNameFromFull,
   type ActExtra,
   type ActType,
@@ -113,7 +114,11 @@ export function ActLetterhead(act: Props) {
   const showSpecialist = act.showSpecialist !== false;
   const extra = act.extra || {};
 
-  const authorInText = (extra.author_act_name || act.authorName || "").trim();
+  // В тексте акта нужен творительный: «…специалистом Александром Золотько»
+  // authorName уже приоритетно из профиля; ensure чинит старые акты с именительным
+  const authorInText = ensureInstrumentalName(
+    (act.authorName || extra.author_act_name || "").trim()
+  );
   const skipAuthor =
     !authorInText || authorInText.toLowerCase() === "администратор";
   const introSpecialist = showSpecialist

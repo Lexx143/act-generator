@@ -8,6 +8,7 @@ import {
   type ActType,
   type EquipmentItem,
 } from "@/lib/db";
+import { ensureInstrumentalName } from "@/lib/act-types";
 import { fmtTimestamp } from "@/lib/format";
 import { ActLetterhead } from "@/components/ActLetterhead";
 import { A4PagePreview } from "@/components/A4PagePreview";
@@ -27,12 +28,12 @@ export default async function ActPage({
     .prepare(
       `SELECT acts.*,
               users.full_name AS author_name,
-              COALESCE(NULLIF(users.act_name, ''), users.full_name) AS author_act_name
+              users.act_name AS profile_act_name
        FROM acts JOIN users ON users.id = acts.created_by
        WHERE acts.id = ?`
     )
     .get(Number(id)) as
-    | (ActRow & { author_act_name?: string })
+    | (ActRow & { profile_act_name?: string })
     | undefined;
 
   if (!act) notFound();
@@ -64,9 +65,13 @@ export default async function ActPage({
       defectDesc={act.defect_desc}
       conclusion={act.conclusion}
       signerName={act.signer_name}
-      authorName={
-        extra.author_act_name || act.author_act_name || act.author_name!
-      }
+      authorName={ensureInstrumentalName(
+        // Профиль (act_name) важнее устаревшего extra — там часто именительный
+        (act.profile_act_name || "").trim() ||
+          (extra.author_act_name || "").trim() ||
+          act.author_name ||
+          ""
+      )}
       actType={actType}
       showSeal={act.show_seal !== 0}
       showSignature={act.show_signature !== 0}

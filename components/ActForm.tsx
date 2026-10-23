@@ -127,7 +127,9 @@ export function ActForm({
     try {
       const client = clientName.trim();
       const f = specialistForms(specialistName || defaultFullName);
-      const authorInText = defaultActName || f.instrumental || "";
+      // В текст акта — творительный: профиль act_name, иначе автосклонение
+      const authorInText =
+        defaultActName.trim() || f.instrumental || f.full || "";
 
       const res = await fetch(isEdit ? `/api/acts/${actId}` : "/api/acts", {
         method: isEdit ? "PATCH" : "POST",
