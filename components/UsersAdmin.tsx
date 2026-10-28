@@ -197,16 +197,21 @@ export function UsersAdmin({
             </DialogHeader>
             <form onSubmit={createUser} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="nu-name">ФИО</Label>
+                <Label htmlFor="nu-name">ФИО (полностью)</Label>
                 <Input
                   id="nu-name"
-                  placeholder="Курганский Никита"
+                  placeholder="Шелестенко Никита Сергеевич"
                   value={form.full_name}
                   onChange={(e) =>
                     setForm({ ...form, full_name: e.target.value })
                   }
                   required
                 />
+                <p className="text-muted-foreground text-xs leading-relaxed">
+                  Обязательно с отчеством — на подписи будет{" "}
+                  <span className="font-medium">Шелестенко Н. С.</span>, без
+                  отчества только «Шелестенко Н.»
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="nu-act-name">ФИО в тексте акта</Label>
@@ -370,15 +375,20 @@ export function UsersAdmin({
           </DialogHeader>
           <form onSubmit={saveEdit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="eu-name">ФИО</Label>
+              <Label htmlFor="eu-name">ФИО (полностью)</Label>
               <Input
                 id="eu-name"
+                placeholder="Шелестенко Никита Сергеевич"
                 value={editForm.full_name}
                 onChange={(e) =>
                   setEditForm({ ...editForm, full_name: e.target.value })
                 }
                 required
               />
+              <p className="text-muted-foreground text-xs leading-relaxed">
+                С отчеством — на подписи будет «Фамилия И. О.» (например
+                Шелестенко Н. С.)
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="eu-act-name">ФИО в тексте акта</Label>

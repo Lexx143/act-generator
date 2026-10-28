@@ -30,6 +30,16 @@ function initialOf(s: string): string {
   return `${s.charAt(0).toUpperCase()}.`;
 }
 
+/** Берём самое полное ФИО из кандидатов (больше слов = лучше для «И. О.»). */
+export function pickFullestName(...candidates: Array<string | undefined | null>): string {
+  return (
+    candidates
+      .map((n) => (n || "").trim().replace(/\s+/g, " "))
+      .filter(Boolean)
+      .sort((a, b) => b.split(" ").length - a.split(" ").length)[0] || ""
+  );
+}
+
 /**
  * Сокращение для подписи: всегда «Фамилия И.» / «Фамилия И. О.»
  * «Шелестенко Никита Сергеевич» → «Шелестенко Н. С.»

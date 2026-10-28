@@ -3,6 +3,7 @@ import { COMPANY, DISPOSAL_BODY } from "@/lib/company";
 import { fmtDate } from "@/lib/format";
 import {
   ensureInstrumentalName,
+  pickFullestName,
   shortNameFromFull,
   type ActExtra,
   type ActType,
@@ -19,6 +20,8 @@ type Props = {
   conclusion: string;
   signerName: string;
   authorName: string;
+  /** Полное ФИО автора из профиля — для «Фамилия И. О.» */
+  authorFullName?: string;
   actType?: ActType;
   showSeal?: boolean;
   showSignature?: boolean;
@@ -131,15 +134,27 @@ export function ActLetterhead(act: Props) {
     ? "о проведении утилизации следующей техники"
     : "о проведении осмотра технического состояния следующей техники";
 
-  // Полное ФИО предпочтительнее старого short — пересоберём «Фамилия И. О.»
+  // Берём самое полное ФИО (с отчеством), иначе «И. О.» не собрать
   const specialistShort = shortNameFromFull(
-    extra.specialist_full || extra.specialist_short || act.signerName
+    pickFullestName(
+      act.authorFullName,
+      extra.specialist_full,
+      act.signerName,
+      extra.specialist_short
+    )
   );
   const headPosition = (
     extra.head_position || COMPANY.defaultHeadPosition
   ).replaceAll("СЕЦ", "СЦ");
+  // Дефолт «Шелестенко Н. С.» важнее устаревшего «Шелестенко Н.»
+  const rawHead = (extra.head_name || "").trim();
   const headName = shortNameFromFull(
-    extra.head_name || COMPANY.defaultHeadName
+    rawHead && rawHead !== "Шелестенко Н." && rawHead !== "Лаура Н."
+      ? rawHead
+      : COMPANY.defaultHeadName
+  );
+  const expertiseSignerShort = shortNameFromFull(
+    pickFullestName(act.authorFullName, act.signerName)
   );
 
   const main = (
@@ -285,7 +300,7 @@ export function ActLetterhead(act: Props) {
     >
       <p className="font-bold">Заключение выдал:</p>
       <p style={{ marginTop: "3mm" }}>
-        {shortNameFromFull(act.signerName)}
+        {expertiseSignerShort}
         <span
           className="inline-block border-b border-black align-baseline"
           style={{ width: "42mm" }}

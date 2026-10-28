@@ -79,11 +79,11 @@ export function ActForm({
   );
   const [defectDesc, setDefectDesc] = useState(initial?.defect_desc ?? "");
   const [conclusion, setConclusion] = useState(initial?.conclusion ?? "");
-  /** Экспертиза: «Заключение выдал» — полное ФИО, без сокращения */
+  /** Экспертиза: полное ФИО (с отчеством) → на бланке «Фамилия И. О.» */
   const [signerName, setSignerName] = useState(
-    initial?.signer_name ?? defaultSigner
+    initial?.signer_name || defaultFullName || defaultSigner
   );
-  /** Утилизация: полное ФИО → сокращение на подписи */
+  /** Утилизация: полное ФИО (с отчеством) → на подписи «Фамилия И. О.» */
   const [specialistName, setSpecialistName] = useState(
     initial?.extra?.specialist_full || defaultFullName || defaultSigner
   );
@@ -141,9 +141,10 @@ export function ActForm({
           equipment,
           defect_desc: isDisposal ? "" : defectDesc,
           conclusion: isDisposal ? "—" : conclusion,
+          // В БД храним полное ФИО; сокращение «Фамилия И. О.» собирается на бланке
           signer_name: isDisposal
-            ? f.short
-            : signerName.trim() || defaultSigner,
+            ? f.full || specialistName.trim() || defaultFullName
+            : signerName.trim() || defaultFullName || defaultSigner,
           act_type: actType,
           show_seal: showSeal,
           show_signature: showSignature,
@@ -352,14 +353,18 @@ export function ActForm({
               />
             </div>
             <div className="space-y-2 sm:max-w-xs">
-              <Label htmlFor="signer">Заключение выдал</Label>
+              <Label htmlFor="signer">Заключение выдал (ФИО полностью)</Label>
               <Input
                 id="signer"
-                placeholder="Василенко Константин"
+                placeholder="Шелестенко Никита Сергеевич"
                 value={signerName}
                 onChange={(e) => setSignerName(e.target.value)}
                 required
               />
+              <p className="text-muted-foreground text-xs">
+                На бланке:{" "}
+                {specialistForms(signerName || defaultFullName).short || "—"}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -370,8 +375,8 @@ export function ActForm({
           <CardHeader>
             <CardTitle>Подписи</CardTitle>
             <CardDescription>
-              Специалист сокращается автоматически; руководитель — Лаура Н. по
-              умолчанию
+              На подписи: «Фамилия И. О.» (нужно отчество). Руководитель по
+              умолчанию — Шелестенко Н. С.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-3">
@@ -388,16 +393,16 @@ export function ActForm({
               <Label htmlFor="head-name">ФИО руководителя (сокр.)</Label>
               <Input
                 id="head-name"
-                placeholder="Лаура Н."
+                placeholder="Шелестенко Н. С."
                 value={headName}
                 onChange={(e) => setHeadName(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="specialist">Специалист</Label>
+              <Label htmlFor="specialist">Специалист (ФИО полностью)</Label>
               <Input
                 id="specialist"
-                placeholder="Василенко Константин"
+                placeholder="Шелестенко Никита Сергеевич"
                 value={specialistName}
                 onChange={(e) => setSpecialistName(e.target.value)}
               />
