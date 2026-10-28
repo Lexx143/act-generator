@@ -5,8 +5,8 @@ export const COMPANY = {
   defaultSigner: "Оразбайулы О.",
   actTitle: "Акт технической экспертизы",
   disposalTitle: "Акт утилизации оборудования",
-  defaultHeadPosition: "Руководитель СЕЦ",
-  defaultHeadName: "Лаура Н.",
+  defaultHeadPosition: "Руководитель СЦ",
+  defaultHeadName: "Шелестенко Н. С.",
 } as const;
 
 export const LEGAL_FORMS = [

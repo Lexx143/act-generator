@@ -379,7 +379,7 @@ export function ActForm({
               <Label htmlFor="head-pos">Должность руководителя</Label>
               <Input
                 id="head-pos"
-                placeholder="Руководитель СЕЦ"
+                placeholder="Руководитель СЦ"
                 value={headPosition}
                 onChange={(e) => setHeadPosition(e.target.value)}
               />
