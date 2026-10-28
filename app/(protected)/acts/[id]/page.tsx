@@ -72,6 +72,7 @@ export default async function ActPage({
           act.author_name ||
           ""
       )}
+      authorFullName={act.author_name || ""}
       actType={actType}
       showSeal={act.show_seal !== 0}
       showSignature={act.show_signature !== 0}
