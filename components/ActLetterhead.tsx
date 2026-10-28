@@ -131,11 +131,16 @@ export function ActLetterhead(act: Props) {
     ? "о проведении утилизации следующей техники"
     : "о проведении осмотра технического состояния следующей техники";
 
+  // Полное ФИО предпочтительнее старого short — пересоберём «Фамилия И. О.»
   const specialistShort = shortNameFromFull(
-    extra.specialist_short || extra.specialist_full || act.signerName
+    extra.specialist_full || extra.specialist_short || act.signerName
   );
-  const headPosition = extra.head_position || COMPANY.defaultHeadPosition;
-  const headName = extra.head_name || COMPANY.defaultHeadName;
+  const headPosition = (
+    extra.head_position || COMPANY.defaultHeadPosition
+  ).replaceAll("СЕЦ", "СЦ");
+  const headName = shortNameFromFull(
+    extra.head_name || COMPANY.defaultHeadName
+  );
 
   const main = (
     <>
@@ -280,7 +285,7 @@ export function ActLetterhead(act: Props) {
     >
       <p className="font-bold">Заключение выдал:</p>
       <p style={{ marginTop: "3mm" }}>
-        {act.signerName}
+        {shortNameFromFull(act.signerName)}
         <span
           className="inline-block border-b border-black align-baseline"
           style={{ width: "42mm" }}

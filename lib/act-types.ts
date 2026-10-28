@@ -19,21 +19,83 @@ export type EquipmentItem = {
   inventory?: string;
 };
 
+/** Похоже на фамилию (в т.ч. -енко/-ов/-ский…) */
+function isSurnameLike(s: string): boolean {
+  return /(енко|ченко|цко|ко|ук|юк|их|ых|ов|ев|ёв|ин|ын|ский|цкий|ская|цкая|ой)$/i.test(
+    s
+  );
+}
+
+function initialOf(s: string): string {
+  return `${s.charAt(0).toUpperCase()}.`;
+}
+
 /**
- * «Василенко Константин» → «Василенко К.»
- * Уже сокращённое («Василенко К.» / «Лаура Н.») оставляем как есть.
+ * Сокращение для подписи: всегда «Фамилия И.» / «Фамилия И. О.»
+ * «Шелестенко Никита Сергеевич» → «Шелестенко Н. С.»
+ * «Никита Шелестенко» → «Шелестенко Н.»
+ * «Золотько Александр Иванович» → «Золотько А. И.»
+ * Уже «Шелестенко Н. С.» / «Шелестенко Н.» — оставляем.
  */
 export function shortNameFromFull(full: string): string {
   const trimmed = full.trim().replace(/\s+/g, " ");
   if (!trimmed) return "";
-  // Уже вида «Фамилия И.» или «Имя Ф.»
-  if (/^.+\s+[A-Za-zА-ЯЁа-яё]\.$/u.test(trimmed)) return trimmed;
+
+  // Уже «Фамилия И.» или «Фамилия И. О.»
+  if (
+    /^[A-Za-zА-ЯЁа-яё-]+\s+[A-Za-zА-ЯЁа-яё]\.(\s+[A-Za-zА-ЯЁа-яё]\.)?$/u.test(
+      trimmed
+    )
+  ) {
+    return trimmed;
+  }
+
   const parts = trimmed.split(" ").filter(Boolean);
   if (parts.length === 1) return parts[0];
-  // Фамилия Имя [Отчество] → Фамилия И.
-  const last = parts[0];
-  const first = parts[1];
-  return `${last} ${first.charAt(0).toUpperCase()}.`;
+
+  let last = "";
+  let first = "";
+  let patronymic = "";
+
+  if (parts.length >= 3) {
+    // Фамилия Имя Отчество  ИЛИ  Имя Отчество Фамилия  ИЛИ  Имя Фамилия Отчество
+    if (isSurnameLike(parts[0]) && !isSurnameLike(parts[1])) {
+      last = parts[0];
+      first = parts[1];
+      patronymic = parts[2];
+    } else if (isSurnameLike(parts[2])) {
+      // Имя [Отчество] Фамилия
+      first = parts[0];
+      patronymic = parts.length > 3 || isSurnameLike(parts[1]) ? "" : parts[1];
+      if (isSurnameLike(parts[1])) {
+        last = parts[1];
+        patronymic = parts[2];
+      } else {
+        last = parts[2];
+        patronymic = parts[1];
+      }
+    } else {
+      last = parts[0];
+      first = parts[1];
+      patronymic = parts[2];
+    }
+  } else {
+    // 2 слова: Фамилия Имя  или  Имя Фамилия
+    if (!isSurnameLike(parts[0]) && isSurnameLike(parts[1])) {
+      first = parts[0];
+      last = parts[1];
+    } else {
+      last = parts[0];
+      first = parts[1];
+    }
+  }
+
+  if (!last) return trimmed;
+  if (!first) return last;
+  if (patronymic) {
+    return `${last} ${initialOf(first)} ${initialOf(patronymic)}`;
+  }
+  return `${last} ${initialOf(first)}`;
 }
 
 /** Фамилия → творительный падеж (мужской, эвристика) */
